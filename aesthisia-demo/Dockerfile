@@ -1,20 +1,22 @@
-# Use the official Node.js 16 image as the base image
-FROM node:16
+FROM node:16-alpine
 
-# Set the working directory inside the container
-WORKDIR /usr/src/app
+RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
-# Copy package.json and package-lock.json to the working directory
+WORKDIR /home/node/app
+
 COPY package*.json ./
 
-# Install application dependencies
-RUN npm install
+USER node
 
-# Copy the rest of the application code
-COPY . .
+RUN npm install express
 
-# Expose the port your app runs on
+COPY --chown=node:node . .
+
 EXPOSE 3000
 
-# Define the command to run your application
-CMD ["npm", "start"]
+CMD [ "node", "start" ]
+
+# Use an official Tomcat image as a parent image
+FROM tomcat:9-jre11
+
+RUN rm -rf /usr/local/tomcat/webapps/*
